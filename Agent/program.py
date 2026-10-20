@@ -99,11 +99,10 @@ def main() -> None:
             You are to review the provided report and do an editorial pass to ensure the report is clear
             and well written.
             Ensure all sources are cited.
-            You have access to web_search, search_arxiv, wikipedia_lookup tools if required to verify any facts.
             Return a well formated, clear, error free report.
             """
         ),
-        tools=[web_search, search_arxiv, wikipedia_lookup],
+        tools=[],
         # Add search_tavily to this list when enabling Tavily.
     )
 
@@ -131,8 +130,7 @@ def main() -> None:
             - a research report writer using delegate_research
             - an editor that specializes in reviewing reports using delegate_editor
             For research questions, delegate to least two distinct agents before answering. 
-            Review the specialist's 
-            evidence, synthesize a clear answer, cite the supplied source 
+            Review the specialist's evidence, synthesize a clear answer, cite the supplied source 
             URLs, and call out important limitations or uncertainty. Do not 
             claim to have verified anything that is not in the research 
             report. If the investigator reports arXiv as unavailable, say so
@@ -153,7 +151,7 @@ def main() -> None:
             manager,
             question,
             client=client,
-            max_turns=6,
+            max_turns=10,
             trace_sinks=[trace_sink],
         )
         print(result.final_output)

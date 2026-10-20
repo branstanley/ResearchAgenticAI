@@ -69,10 +69,24 @@ def search_arxiv(query: str, max_results: int = 5) -> str:
 
 
 def wikipedia_lookup(query: str) -> str:
-    """Look up a Wikipedia article and return its title, summary, and URL."""
+    """Look up a Wikipedia article; report clearly when no matching page exists."""
     if not query.strip():
         raise ValueError("query must not be empty")
-    page = wikipedia.page(query, auto_suggest=True, redirect=True)
+    try:
+        page = wikipedia.page(query, auto_suggest=True, redirect=True)
+    except wikipedia.exceptions.PageError:
+        return json.dumps(
+            {
+                "status": "not_found",
+                "source": "Wikipedia",
+                "query": query,
+                "message": (
+                    "No matching Wikipedia page was found. Try a broader or "
+                    "more specific query, or continue with another source."
+                ),
+            },
+            ensure_ascii=False,
+        )
     summary = wikipedia.summary(
         page.title,
         sentences=5,
