@@ -1,0 +1,21 @@
+services:
+  ollama:
+    build: ./docker
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_MODEL: qwen3:8b
+      OLLAMA_KEEP_ALIVE: 30m
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+
+volumes:
+  ollama_data:

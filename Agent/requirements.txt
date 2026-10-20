@@ -1,0 +1,8 @@
+aisuite[ollama]
+numpy
+pandas
+wikipedia
+ddgs
+arxiv
+nest-asyncio
+# tavily-python  # Uncomment when enabling the optional Tavily search tool.
