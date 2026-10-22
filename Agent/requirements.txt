@@ -1,4 +1,5 @@
 aisuite[ollama]
+langgraph
 numpy
 pandas
 wikipedia

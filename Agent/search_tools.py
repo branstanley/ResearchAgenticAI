@@ -4,6 +4,8 @@ import threading
 import arxiv
 import wikipedia
 from ddgs import DDGS
+from ddgs.exceptions import DDGSException
+from requests.exceptions import JSONDecodeError
 
 wikipedia.set_user_agent("ResearchAssistant/0.1 (local research assistant)")
 
@@ -19,9 +21,25 @@ def _validate_search(query: str, max_results: int) -> None:
 
 
 def web_search(query: str, max_results: int = 5) -> str:
-    """Search the web and return titles, URLs, and short result descriptions."""
+    """Search the web and return results, or a status when none are found."""
     _validate_search(query, max_results)
-    results = DDGS().text(query, max_results=max_results)
+    try:
+        results = DDGS().text(query, max_results=max_results)
+    except DDGSException as exc:
+        if str(exc) != "No results found.":
+            raise
+        return json.dumps(
+            {
+                "status": "no_results",
+                "source": "web search",
+                "query": query,
+                "message": (
+                    "The web search returned no results. Try a different "
+                    "query or continue with another source."
+                ),
+            },
+            ensure_ascii=False,
+        )
     return json.dumps(results, ensure_ascii=False)
 
 
@@ -69,7 +87,7 @@ def search_arxiv(query: str, max_results: int = 5) -> str:
 
 
 def wikipedia_lookup(query: str) -> str:
-    """Look up a Wikipedia article; report clearly when no matching page exists."""
+    """Look up a Wikipedia article and report missing or unavailable results."""
     if not query.strip():
         raise ValueError("query must not be empty")
     try:
@@ -87,12 +105,42 @@ def wikipedia_lookup(query: str) -> str:
             },
             ensure_ascii=False,
         )
-    summary = wikipedia.summary(
-        page.title,
-        sentences=5,
-        auto_suggest=False,
-        redirect=True,
-    )
+    except JSONDecodeError:
+        return json.dumps(
+            {
+                "status": "unavailable",
+                "source": "Wikipedia",
+                "query": query,
+                "message": (
+                    "Wikipedia returned an invalid response. Continue with "
+                    "other available sources and disclose that Wikipedia "
+                    "could not be searched."
+                ),
+            },
+            ensure_ascii=False,
+        )
+
+    try:
+        summary = wikipedia.summary(
+            page.title,
+            sentences=5,
+            auto_suggest=False,
+            redirect=True,
+        )
+    except JSONDecodeError:
+        return json.dumps(
+            {
+                "status": "unavailable",
+                "source": "Wikipedia",
+                "query": query,
+                "message": (
+                    "Wikipedia returned an invalid response. Continue with "
+                    "other available sources and disclose that Wikipedia "
+                    "could not be searched."
+                ),
+            },
+            ensure_ascii=False,
+        )
     return f"{page.title}\n{page.url}\n{summary}"
 
 
