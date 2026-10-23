@@ -12,7 +12,8 @@ def build_outliner() -> tuple[ai.Agent, Callable[..., Any]]:
         instructions=(
             """
             You are a research specialist creating the outline of a large scientific report. 
-            You are to review the provided research items, distill the information and create a detailed outline for a report
+            You are to review the provided research items, distill the information and create a detailed outline for a report.
+            The report outline should ensure there is a clear overview, and conclusion.  Try to ensure there is a MINIMUM of 3 additional sections, but more is better.
             Return a well formated, clear, outline in json arrray format with no additional commentary.
             Format: [{"section": "Title of Section", "talking_points" : "A list of talking points"}]
             """

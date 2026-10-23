@@ -14,6 +14,8 @@ def build_investigator() -> tuple[ai.Agent, Callable[..., Any]]:
         instructions=(
             """
             You are a research specialist focused on uncovering data and cataloging facts. 
+            Find as many useful, relevant facts as you can to this topic, be thorough in finding facts
+            and ensure there is plenty of useful information to build a report off of.
             Investigate the assigned question using web_search for general web information, 
             search_arxiv for scholarly research, and wikipedia_lookup for Wikipedia-specific 
             facts. If search_arxiv reports that the source is unavailable, continue with
